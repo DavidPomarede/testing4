@@ -1,21 +1,14 @@
 //mapbox info
 
-
-var map = L.map('mapid', {
-     //center: [43.64701, -79.39425], //comment out one of the centers
-     center: [40, -80],
-     zoom: 15
-   });
-   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-   }).addTo(map);
+var latitude;
+var longitude;
 
 
 
 //var mymap = L.map('mapid').setView([51.505, -0.09], 13);
 
 //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-//    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+//    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery ï¿½ <a href="https://www.mapbox.com/">Mapbox</a>',
 //   maxZoom: 18,
 //    id: 'mapbox.streets',
 //    accessToken: 'your.mapbox.access.token'
@@ -30,10 +23,6 @@ var map = L.map('mapid', {
 //    radius: 500
 //}).addTo(mymap);
 
-var popup = L.popup()
-    .setLatLng([40, -80])
-    .setContent("Hello World.")
-    .openOn(map);
 
 //wikipedia search
 
@@ -45,6 +34,7 @@ var wikiResults;
 var QRimg = $('<img>');
 $('#qrstuff').append(QRimg);
 
+
 console.log(wikiUrl);
 var wikiUrl;
 
@@ -53,7 +43,7 @@ $('#submit').on("click", function(){
 searchTerm = $('#state');
 searchRefined = searchTerm[0].value;
 
-wikiUrl = "https://en.wikipedia.org/w/api.php?action=opensearch&search="  + searchRefined + "&format=json&origin=*";
+wikiUrl = "http://open.mapquestapi.com/geocoding/v1/address?key=KL6bvb80lfLEE1Ys5TjUKyu6Be7gdXLX&location="  + searchRefined;
 
 
     $.ajax({
@@ -63,12 +53,34 @@ wikiUrl = "https://en.wikipedia.org/w/api.php?action=opensearch&search="  + sear
         async: false,
         dataType: "json",
         success: function (data, textStatus, jqXHR) {
-            console.log(data[2][0]);
+            console.log(data);
+            console.log(data.results[0].locations[0].latLng.lat);
+            console.log(data.results[0].locations[0].latLng.lng);
+            latitude = data.results[0].locations[0].latLng.lat;
+            longitude = data.results[0].locations[0].latLng.lng;
             wikiResults = data[2][0];
+
         },
         error: function (errorMessage) {
         }
     });
+
+
+    var map = L.map('mapid', {
+      //center: [43.64701, -79.39425], //comment out one of the centers
+      center: [latitude, longitude],
+      zoom: 15
+    });
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    var popup = L.popup()
+    .setLatLng([latitude, longitude])
+    .setContent("You are here")
+    .openOn(map);
+
+    
+
 	searchTerm = $('#state');
   console.log(wikiResults);
   var stuffToQr = wikiResults;
